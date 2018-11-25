@@ -19,9 +19,15 @@ import re
 
 
 class Preprocessing():
-    def __init__(self, TrainDataPath, TestDataPath, Unlabeled=None):
-        self.train = pd.read_csv(TrainDataPath, header=0, delimiter="\t", quoting=3)
-        self.test = pd.read_csv(TestDataPath, header=0, delimiter="\t", quoting=3)
+    def __init__(self, TrainDataPath1, TrainDataPath2, TestDataPath1, TestDataPath2, Unlabeled=None):
+        self.train = pd.read_csv(TrainDataPath1, header=0, delimiter=",", quoting=3) + pd.read_csv(TrainDataPath2,
+                                                                                                   header=0,
+                                                                                                   delimiter=",",
+                                                                                                   quoting=3)
+        self.test = pd.read_csv(TestDataPath1, header=0, delimiter=",", quoting=3) + pd.read_csv(TestDataPath2,
+                                                                                                 header=0,
+                                                                                                 delimiter=",",
+                                                                                                 quoting=3)
         self.y_train = self.train['sentiment']
 
     def CommentsToWordlist(self, comments):
@@ -165,9 +171,9 @@ if __name__ == "__main__":
     # Y_test = pd.read_csv("../resource/neg_test.csv")
 
     process = Preprocessing(
-        "./RowData/LabeledTrainData.tsv", "./RowData/TestData.tsv")
+        "../resource/pos.csv", "../resource/neg.csv", "../resource/pos_test.tsv", "../resource/neg_test.tsv")
 
-    X_train, y_train, X_test= process.tfidf(ngram=4)
+    X_train, y_train, X_test = process.tfidf(ngram=4)
 
     vec = DictVectorizer(sparse=False)
     # X_train = vec.fit_transform(X_train.to_dict(orient='record'))

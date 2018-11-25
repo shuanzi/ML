@@ -100,28 +100,28 @@ def wash_to_csv(argv, isTraining):
     sentiment_value = argv[2]
 
     if isTraining:
-        csv_file_name = sentiment + ".csv"
+        csv_file_name = sentiment + ".tsv"
         lines = []
-        lines.append("sentiment,comments\n")
+        lines.append("sentiment\tcomments\n")
         for file in files:
             content = _open(file)
             text_processor = TextPreProcess(content)
             text_processor.Print()
             clean_text = text_processor.process()
             # text_processor.Print()
-            line = str(sentiment_value) + "," + clean_text + "\n"
+            line = str(sentiment_value) + "\t" + clean_text + "\n"
             lines.append(line)
             print(file + ", done!")
 
         fo = open(csv_file_name, "w")
         fo.writelines(lines)
     else:
-        csv_file_name = sentiment + "_test.csv"
+        csv_file_name = sentiment + "_test.tsv"
         lines = []
-        lines.append("sentiment,comments\n")
+        lines.append("sentiment\tomments\n")
         for file in files:
             content = _open(file)
-            line = str(sentiment_value) + "," + content + "\n"
+            line = str(sentiment_value) + "\t" + content + "\n"
             lines.append(line)
             print(file + ", done!")
 
@@ -159,7 +159,7 @@ def process_test_data():
     argvs.append([pos_files, "pos", 1])
     argvs.append([neg_files, "neg", -1])
     for arg in argvs:
-        wash_to_csv(arg, False)
+        wash_to_csv(arg, True)
 
 
 if __name__ == "__main__":
