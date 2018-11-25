@@ -1,5 +1,8 @@
 import jieba
+import nltk
 from nltk.stem.porter import PorterStemmer
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 
 STOP_WORDS = ["a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any",
               "are", "as", "at", "be", "because", "been", "before", "being", "below", "between",
@@ -19,6 +22,7 @@ STOP_WORDS = ["a", "about", "above", "after", "again", "against", "all", "am", "
               "yours", "yourself", "yourselves"]
 
 porter_stemmer = PorterStemmer()
+wordnet_lemmatizer = WordNetLemmatizer()
 
 def remove_stop_words(wordList, stopwords):
     return [w for w in wordList if w not in stopwords]

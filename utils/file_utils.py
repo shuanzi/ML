@@ -12,7 +12,6 @@ def _open(f):
         print(error)
         return ""
 
-
 def get_all_file_path(dir):
     list = []
     for f in listdir(dir):

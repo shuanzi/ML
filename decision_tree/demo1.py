@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.grid_search import GridSearchCV
+from sklearn.model_selection import GridSearchCV
 from sklearn import model_selection, metrics
 import matplotlib.pylab as plt
 # %matplotlib inline
@@ -156,17 +156,17 @@ gsearch4= GridSearchCV(estimator = RandomForestClassifier(n_estimators= 60,max_d
 gsearch4.fit(X,y)
 gsearch4.grid_scores_,gsearch4.best_params_, gsearch4.best_score_
 #输出如下：
-([mean:0.81981, std: 0.02586, params: {'max_features': 3},
-      mean: 0.81639, std: 0.02533, params:{'max_features': 5},
-      mean: 0.82487, std: 0.02110, params:{'max_features': 7},
-      mean: 0.81704, std: 0.02209, params:{'max_features': 9}],
-      {'max_features':7},
-      0.8248650279471544)
+# ([mean:0.81981, std: 0.02586, params: {'max_features': 3},
+#       mean: 0.81639, std: 0.02533, params:{'max_features': 5},
+#       mean: 0.82487, std: 0.02110, params:{'max_features': 7},
+#       mean: 0.81704, std: 0.02209, params:{'max_features': 9}],
+#       {'max_features':7},
+#       0.8248650279471544)
 
 #用我们搜索到的最佳参数，我们再看看最终的模型拟合：
 rf2= RandomForestClassifier(n_estimators= 60, max_depth=13, min_samples_split=120,
                             min_samples_leaf=20,max_features=7 ,oob_score=True, random_state=10)
 rf2.fit(X,y)
-printrf2.oob_score_
+# printrf2.oob_score_
 #此时的输出为：0.984
 #可见此时模型的袋外分数基本没有提高，主要原因是0.984已经是一个很高的袋外分数了，如果想进一步需要提高模型的泛化能力，我们需要更多的数据。
