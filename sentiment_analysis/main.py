@@ -47,7 +47,7 @@ class Preprocessing():
         return (words)
 
     def tfidf(self, ngram=2):
-        tfv = TFIV(min_df=3, max_features=None,
+        tfv = TFIV(min_df=1, max_features=None,
                    strip_accents='unicode', analyzer='word', token_pattern=r'\w{1,}',
                    ngram_range=(1, ngram), use_idf=1, smooth_idf=1, sublinear_tf=1,
                    stop_words='english')
@@ -171,11 +171,14 @@ if __name__ == "__main__":
     # Y_test = pd.read_csv("../resource/neg_test.csv")
 
     process = Preprocessing(
-        "../resource/pos.csv", "../resource/neg.csv", "../resource/pos_test.tsv", "../resource/neg_test.tsv")
+        "../resource/pos.csv", "../resource/neg.csv", "../resource/pos2.tsv", "../resource/neg1.tsv")
 
     X_train, y_train, X_test = process.tfidf(ngram=4)
+    clf = classify(X_train, y_train, X_test)
+    clf.mnb()
 
-    vec = DictVectorizer(sparse=False)
+
+    # vec = DictVectorizer(sparse=False)
     # X_train = vec.fit_transform(X_train.to_dict(orient='record'))
     # X_test = vec.fit_transform(X_test.to_dict(orient='record'))
 
