@@ -95,56 +95,59 @@ class TextPreProcess(object):
 
 
 def wash_to_csv(argv, isTraining):
-    files = argv[0]
-    sentiment = argv[1]
-    sentiment_value = argv[2]
+    pos_files = argv[0]
+    neg_files = argv[1]
+    unsup_files = argv[2]
+    sentiment = argv[3]
 
+    csv_file_name = "test.csv"
     if isTraining:
-        csv_file_name = sentiment + ".tsv"
-        lines = []
-        lines.append("sentiment\tcomments\n")
-        for file in files:
-            content = _open(file)
-            text_processor = TextPreProcess(content)
-            text_processor.Print()
-            clean_text = text_processor.process()
-            # text_processor.Print()
-            line = str(sentiment_value) + "\t" + clean_text + "\n"
-            lines.append(line)
-            print(file + ", done!")
+        csv_file_name = "trian.csv"
 
-        fo = open(csv_file_name, "w")
-        fo.writelines(lines)
-    else:
-        csv_file_name = sentiment + "_test.tsv"
-        lines = []
-        lines.append("sentiment\tomments\n")
-        for file in files:
-            content = _open(file)
-            line = str(sentiment_value) + "\t" + content + "\n"
-            lines.append(line)
-            print(file + ", done!")
+    lines = []
+    lines.append("sentiment,comments\n")
+    for file in pos_files:
+        sentiment_value = 1
+        content = _open(file)
+        text_processor = TextPreProcess(content)
+        clean_text = text_processor.process()
+        line = str(sentiment_value) + "," + clean_text + "\n"
+        lines.append(line)
+        print(file + ", done!")
 
-        fo = open(csv_file_name, "w")
-        fo.writelines(lines)
+    for file in neg_files:
+        sentiment_value = -1
+        content = _open(file)
+        text_processor = TextPreProcess(content)
+        text_processor.Print()
+        clean_text = text_processor.process()
+        line = str(sentiment_value) + "," + clean_text + "\n"
+        lines.append(line)
+        print(file + ", done!")
+
+    for file in unsup_files:
+        sentiment_value = 0
+        content = _open(file)
+        text_processor = TextPreProcess(content)
+        text_processor.Print()
+        clean_text = text_processor.process()
+        line = str(sentiment_value) + "," + clean_text + "\n"
+        lines.append(line)
+        print(file + ", done!")
+
+    fo = open(csv_file_name, "w")
+    fo.writelines(lines)
 
 
 def process_training_data():
     pos_root_dir = "../resource/imdb_data/train/pos"
     neg_root_dir = "../resource/imdb_data/train/neg"
     unsup_root_dir = "../resource/imdb_data/train/unsup"
+
     pos_files = get_all_file_path(pos_root_dir)
-    print(pos_files)
     neg_files = get_all_file_path(neg_root_dir)
-    print(neg_files)
     unsup_files = get_all_file_path(unsup_root_dir)
-    print(unsup_files)
-    argvs = []
-    argvs.append([pos_files, "pos", 1])
-    argvs.append([neg_files, "neg", -1])
-    argvs.append([unsup_files, "unsup", 0])
-    for arg in argvs:
-        wash_to_csv(arg, True)
+    wash_to_csv([pos_files, neg_files, unsup_files, "pos"], True)
 
 
 def process_test_data():
@@ -152,16 +155,10 @@ def process_test_data():
     neg_root_dir = "../resource/imdb_data/test/neg"
 
     pos_files = get_all_file_path(pos_root_dir)
-    print(pos_files)
     neg_files = get_all_file_path(neg_root_dir)
-    print(neg_files)
-    argvs = []
-    argvs.append([pos_files, "pos", 1])
-    argvs.append([neg_files, "neg", -1])
-    for arg in argvs:
-        wash_to_csv(arg, True)
+    wash_to_csv([pos_files, neg_files, "", "pos"], False)
 
 
 if __name__ == "__main__":
-    # process_training_data()
-    process_test_data()
+    process_training_data()
+    # process_test_data()
