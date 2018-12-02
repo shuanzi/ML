@@ -4,12 +4,13 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics import classification_report
 from sklearn.svm import SVC
-
 import pandas as pd
+from sklearn.model_selection import RandomizedSearchCV
 
 
 def load_data():
     keeplandData = pd.read_csv('/Users/daixiquan/Documents/workout/decision_tree/resource/keepland_user_profile.csv')
+    # keeplandData = pd.read_csv('/Users/daixiquan/Documents/workout/decision_tree/resource/keepland_user_profile2.csv')
     keeplandData.head()
 
     X = keeplandData[
@@ -30,10 +31,11 @@ x_train, x_test, y_train, y_test, feature_names = load_data()
 
 def searchBestParams(clf):
     # 首先对n_estimators进行网格搜索
-    param_test1 = {'n_estimators': range(10, 71, 10)}
+    param_test1 = {'C': [0.01,10]}
     gsearch1 = GridSearchCV(clf, param_grid=param_test1, scoring='roc_auc', cv=5)
     gsearch1.fit(x_train, y_train)
     print(gsearch1.best_estimator_, gsearch1.best_score_)
+
 
 
 def try_different_method(clf, title):
@@ -47,19 +49,8 @@ def try_different_method(clf, title):
 
 
 if __name__ == "__main__":
-    dt = DecisionTreeClassifier(criterion="entropy", max_depth=5)
-    try_different_method(dt, "DecisionTree")
+    clf = SVC(kernel='linear', C=0.1)
+    searchBestParams(clf)
+    # try_different_method(clf, "kernel='linear'")
 
-    # rf = ensemble.RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
-    #                                      max_depth=8, max_features='sqrt', max_leaf_nodes=None,
-    #                                      min_impurity_decrease=0.0, min_impurity_split=None,
-    #                                      min_samples_leaf=20, min_samples_split=100,
-    #                                      min_weight_fraction_leaf=0.0, n_estimators=50, n_jobs=None,
-    #                                      oob_score=False, random_state=10, verbose=0, warm_start=False)
-    # try_different_method(rf, "RandomForest")
-    # # searchBestParams(rf)
-    #
-    # ada = ensemble.AdaBoostClassifier(algorithm='SAMME.R', base_estimator=None,
-    #                                   learning_rate=1.0, n_estimators=40, random_state=None)
-    # try_different_method(ada, "AdaBoost")
-    # # searchBestParams(ada)
+

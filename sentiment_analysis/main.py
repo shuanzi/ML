@@ -7,6 +7,26 @@ from sklearn.linear_model import LogisticRegression as LR
 from sklearn.feature_extraction.text import CountVectorizer
 
 
+def load_data():
+    keeplandData = pd.read_csv('/Users/daixiquan/Documents/workout/decision_tree/resource/keepland_user_profile.csv')
+    keeplandData.head()
+    # keeplandData.info()
+
+    X = keeplandData[
+        ['bookcount', 'trainingcount', 'age', 'gender', 'goal', 'trainingtimes', 'trainingdays', 'allduration',
+         'allcalorie', 'maxcomboday', 'kg', 'bmi']]
+
+    y = keeplandData['bought_package']
+    X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size=0.25, random_state=33)
+    vec = DictVectorizer(sparse=False)
+    X_train = vec.fit_transform(X_train.to_dict(orient='record'))
+    X_test = vec.fit_transform(X_test.to_dict(orient='record'))
+
+    return X_train, X_test, Y_train, Y_test, vec.feature_names_
+
+
+x_train, x_test, y_train, y_test, feature_names = load_data()
+
 class Preprocessing():
     def __init__(self, train_data_path, test_data_path, Unlabeled=None):
         self.train = pd.read_csv(train_data_path)
