@@ -28,23 +28,18 @@ class TextPreProcess(object):
         self.replacer = RegexReplacer()
 
     def RemoveHTML(self):
-        """ remove HTML tags """
         return [BeautifulSoup(sentence, "lxml").get_text() for sentence in self.text]
 
     def SplitPhase(self):
-        """ split paragraph to sentence """
         return self.PunktTokenizer.tokenize(self.text)
 
     def ReplaceAbbre(self):
-        """ Replace abbreviation """
         return [self.replacer.replace(sentence) for sentence in self.text]
 
     def SplitSent(self):
-        """ split sentence to words """
         return [self.tokenizer.tokenize(sentence) for sentence in self.text]
 
     def lemma(self, tags):
-        """ lemmatizer for tagged words """
         WORD = []
         for word, tag in tags:
             wntag = tag[0].lower()
@@ -54,21 +49,17 @@ class TextPreProcess(object):
             else:
                 lemma = self.wordnet_lemmatizer.lemmatize(word, wntag)
 
-            # stemmered_word = porter_stemmer.stem(lemma)
             WORD.append(lemma)
         return WORD
 
     def Lemmatizer(self):
-        """ Lemmatizer words use WordNet """
         return [self.lemma(nltk.pos_tag(sentence)) for sentence in self.text]
 
     def CleanWords(self, sentence):
-        """ remove len < 3 and non alpha and lowercase """
         stops = cachedStopWords
         return [word.lower() for word in sentence if len(word) >= 3 and word.isalpha() and not word in stops]
 
     def CleanSentences(self):
-        """ clean sentences """
         return [self.CleanWords(sentence) for sentence in self.text]
 
     def ToStr(self):
@@ -79,9 +70,6 @@ class TextPreProcess(object):
         return str[:-1]
 
     def process(self):
-        """ Remove HTML tags, Replace Abbre, Split into words
-            if use word2vector, should not use ``stopwords ``
-        """
         self.text = self.SplitPhase()
         self.text = self.ReplaceAbbre()
         self.text = self.SplitSent()
@@ -98,7 +86,6 @@ def wash_to_csv(argv, isTraining):
     pos_files = argv[0]
     neg_files = argv[1]
     unsup_files = argv[2]
-    sentiment = argv[3]
 
     csv_file_name = "test.csv"
     if isTraining:
@@ -161,4 +148,4 @@ def process_test_data():
 
 if __name__ == "__main__":
     process_training_data()
-    # process_test_data()
+    process_test_data()
