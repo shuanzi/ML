@@ -1,29 +1,34 @@
-from sklearn import ensemble
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import train_test_split, GridSearchCV
+import pandas as pd
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.svm import SVC
-import pandas as pd
-from sklearn.model_selection import RandomizedSearchCV
-
+from sklearn.preprocessing import StandardScaler
 
 def load_data():
-    keeplandData = pd.read_csv('/Users/daixiquan/Documents/workout/decision_tree/resource/keepland_user_profile.csv')
+    keeplandData = pd.read_csv(
+        '/Users/daixiquan/Documents/Keep_code/ML/data/keepland_user_profile.csv')
     # keeplandData = pd.read_csv('/Users/daixiquan/Documents/workout/decision_tree/resource/keepland_user_profile2.csv')
     keeplandData.head()
 
     X = keeplandData[
-        ['bookcount', 'trainingcount', 'age', 'gender', 'goal', 'trainingtimes', 'trainingdays', 'allduration',
+        ['bookcount', 'trainingcount', 'age', 'goal', 'trainingtimes', 'trainingdays', 'allduration',
          'allcalorie', 'maxcomboday', 'kg', 'bmi']]
 
     y = keeplandData['bought_package']
     X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size=0.25, random_state=33)
     vec = DictVectorizer(sparse=False)
-    X_train = vec.fit_transform(X_train.to_dict(orient='record'))
-    X_test = vec.fit_transform(X_test.to_dict(orient='record'))
+    scaler = StandardScaler()
 
-    return X_train, X_test, Y_train, Y_test, vec.feature_names_
+    scaler.fit(X_train)
+    X_train = scaler.fit_transform(X_train)
+    scaler.fit(X_test)
+    X_test = scaler.fit_transform(X_test)
+
+    # X_train = vec.fit_transform(X_train.to_dict(orient='record'))
+    # X_test = vec.fit_transform(X_test.to_dict(orient='record'))
+
+    return X_train, X_test, Y_train, Y_test, ""
 
 
 x_train, x_test, y_train, y_test, feature_names = load_data()
@@ -49,8 +54,6 @@ def try_different_method(clf, title):
 
 
 if __name__ == "__main__":
-    clf = SVC(kernel='linear', C=0.1)
-    searchBestParams(clf)
-    # try_different_method(clf, "kernel='linear'")
-
-
+    clf = SVC(kernel='linear', C=5)
+    # searchBestParams(clf)
+    try_different_method(clf, "kernel='linear'")
