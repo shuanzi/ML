@@ -5,7 +5,16 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.feature_extraction.text import TfidfVectorizer as TFIV
 from sklearn.linear_model import LogisticRegression as LR
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
 
+
+def print_top_words(model, feature_names, n_top_words):
+    for topic_idx, topic in enumerate(model.components_):
+        print "Topic #%d:" % topic_idx
+        print " ".join([feature_names[i]
+                        for i in topic.argsort()[:-n_top_words - 1:-1]])
+    print
+    print model.components_
 
 class Preprocessing():
     def __init__(self, train_data_path, test_data_path, Unlabeled=None):
@@ -35,33 +44,15 @@ class Preprocessing():
         X_all = self.traindata + self.testdata
         lentrain = len(self.traindata)
 
-        vectorizer.fit(X_all)
-        X_all = vectorizer.transform(X_all)
+        tf = vectorizer.fit_transform(X_all)
 
-        self.X = X_all[:lentrain]
-        self.X_test = X_all[lentrain:]
+        n_topics = 30
+        lda = LatentDirichletAllocation(n_topics=n_topics, max_iter=50, learning_method='batch')
+        lda.fit(tf)
 
-        print("vectorization data size: ", self.X.shape)
-        return self.X, self.y_train, self.X_test, self.y_test
-
-    def tfidf(self, ngram=2):
-        tfv = TFIV(min_df=3, max_features=None,
-                   strip_accents='unicode', analyzer='word', token_pattern=r'\w{1,}',
-                   ngram_range=(1, ngram), use_idf=1, smooth_idf=1, sublinear_tf=1,
-                   stop_words='english')
-
-        X_all = self.traindata + self.testdata
-        lentrain = len(self.traindata)
-
-        tfv.fit(X_all)
-        X_all = tfv.transform(X_all)
-
-        self.X = X_all[:lentrain]
-        self.X_test = X_all[lentrain:]
-
-        print("vectorization data size: ", self.X.shape)
-        return self.X, self.y_train, self.X_test, self.y_test
-
+        n_top_words=20
+        tf_feature_names = vectorizer.get_feature_names()
+        print_top_words(lda, tf_feature_names, n_top_words)
 
 class classify():
     def __init__(self, X_train, Y_Train, X_Test, Y_Test):
@@ -91,10 +82,9 @@ class classify():
 
 
 if __name__ == "__main__":
-    process = Preprocessing("../resource/train2.csv", "../resource/test.csv")
+    process = Preprocessing("../data/train.csv", "../data/test.csv")
     process.build_data()
-    X_train, y_train, X_test, Y_test = process.tfidf(ngram=4)
-    # X_train, y_train, X_test, Y_test = process.vec()
-    clf = classify(X_train, y_train, X_test, Y_test)
+    X_train, y_train, X_test, Y_test = process.vec()
+    # clf = classify(X_train, y_train, X_test, Y_test)
     # clf.mnb()
-    clf.LR()
+    # clf.LR()

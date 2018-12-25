@@ -10,8 +10,8 @@ from nltk.stem import WordNetLemmatizer
 from bs4 import BeautifulSoup
 from nltk.stem.porter import PorterStemmer
 
-from utils.replacers import RegexReplacer
-from utils.file_utils import get_all_file_path, _open
+from replacers import RegexReplacer
+from file_utils import get_all_file_path, _open
 
 cachedStopWords = stopwords.words("english")
 porter_stemmer = PorterStemmer()
@@ -89,7 +89,7 @@ def wash_to_csv(argv, isTraining):
 
     csv_file_name = "test.csv"
     if isTraining:
-        csv_file_name = "trian.csv"
+        csv_file_name = "train.csv"
 
     lines = []
     lines.append("sentiment,comments\n")
@@ -127,9 +127,9 @@ def wash_to_csv(argv, isTraining):
 
 
 def process_training_data():
-    pos_root_dir = "../resource/imdb_data/train/pos"
-    neg_root_dir = "../resource/imdb_data/train/neg"
-    unsup_root_dir = "../resource/imdb_data/train/unsup"
+    pos_root_dir = "../resource/train/pos"
+    neg_root_dir = "../resource/train/neg"
+    unsup_root_dir = "../resource/train/unsup"
 
     pos_files = get_all_file_path(pos_root_dir)
     neg_files = get_all_file_path(neg_root_dir)
@@ -138,8 +138,8 @@ def process_training_data():
 
 
 def process_test_data():
-    pos_root_dir = "../resource/imdb_data/test/pos"
-    neg_root_dir = "../resource/imdb_data/test/neg"
+    pos_root_dir = "../resource/test/pos"
+    neg_root_dir = "../resource/test/neg"
 
     pos_files = get_all_file_path(pos_root_dir)
     neg_files = get_all_file_path(neg_root_dir)
