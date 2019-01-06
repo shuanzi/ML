@@ -1,12 +1,6 @@
 import pandas as pd
-from sklearn.naive_bayes import MultinomialNB as MNB
-from sklearn.metrics import classification_report
-from sklearn.model_selection import GridSearchCV
-from sklearn.feature_extraction.text import TfidfVectorizer as TFIV
-from sklearn.linear_model import LogisticRegression as LR
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
-from sklearn.ensemble import BaggingClassifier
 
 
 def print_top_words(model, feature_names, n_top_words):
@@ -18,11 +12,12 @@ def print_top_words(model, feature_names, n_top_words):
 
 
 class Preprocessing():
-    def __init__(self, train_data_path, test_data_path, Unlabeled=None):
+    def __init__(self, train_data_path, test_data_path):
         self.train = pd.read_csv(train_data_path)
         self.test = pd.read_csv(test_data_path)
         self.y_train = self.train['sentiment']
         self.y_test = self.test['sentiment']
+        self.feature_names = []
 
     def commtent_to_word_list(self, comments):
         words = comments.lower().split()
@@ -48,33 +43,13 @@ class Preprocessing():
         vectorizer.fit(X_all)
         X_all = vectorizer.transform(X_all)
 
+        self.feature_names = vectorizer.get_feature_names()
+
         self.X = X_all[:lentrain]
         self.X_test = X_all[lentrain:]
 
         print("vectorization data size: ", self.X.shape)
         return self.X, self.y_train, self.X_test, self.y_test
-
-    # def vec(self):
-    #     vectorizer = CountVectorizer(analyzer="word", tokenizer=None, preprocessor=None, stop_words=None)
-    #
-    #     X_all = self.traindata + self.testdata
-    #     lentrain = len(self.traindata)
-    #
-    #     tf = vectorizer.fit_transform("../data/neg")
-    #
-    #     lda = LatentDirichletAllocation(n_topics=n_topics, max_iter=50, learning_method='batch')
-    #     clf = BaggingClassifier(base_estimator=lda)
-    #
-    #
-    #     clf.fit(self.X_train, self.Y_Train)
-    #
-    #     # n_topics = 30
-    #     # lda = LatentDirichletAllocation(n_topics=n_topics, max_iter=50, learning_method='batch')
-    #     # lda.fit(tf)
-    #     #
-    #     # n_top_words=20
-    #     # tf_feature_names = vectorizer.get_feature_names()
-    #     # print_top_words(lda, tf_feature_names, n_top_words)
 
 
 class classify():
@@ -84,32 +59,15 @@ class classify():
         self.X_Test = X_Test
         self.Y_Test = Y_Test
 
-    def LR(self):
-        grid_values = {'C': [1e-5, 1e-4, 1e-3, 1e-2, 1e-1]}
+    def lda(self, feature_names):
+        n_topics = 30
+        lda = LatentDirichletAllocation(n_topics=n_topics,
+                                        max_iter=50,
+                                        learning_method='batch')
 
-        clf = GridSearchCV(LR(penalty='l2', dual=True, random_state=0),
-                           grid_values, scoring='roc_auc', cv=20, n_jobs=4)
-        clf.fit(self.X_train, self.Y_Train)  # Fit the model.
-        print("using LogisticRegression, Best: %f using %s" %
-              (clf.best_score_, clf.best_params_))
-        y_predict = clf.predict(self.X_Test)
-        print(classification_report(self.Y_Test, y_predict))
+        lda.fit(self.X_train)
 
-    def mnb(self):
-        clf = MNB()
-        clf.fit(self.X_train, self.Y_Train)
-        y_predict = clf.predict(self.X_Test)
-        score = clf.score(self.X_Test, self.Y_Test)
-        print("using mnb, score %s" % score)
-        print(classification_report(self.Y_Test, y_predict))
-
-    def bg(self):
-        n_topics = 18
-        lda = LatentDirichletAllocation(n_topics=n_topics, max_iter=50, learning_method='batch')
-        clf = BaggingClassifier(base_estimator=lda)
-        clf.fit(X_train, y_train)
-        y_predict = clf.predict(self.X_Test)
-        print(classification_report(self.Y_Test, y_predict))
+        print_top_words(lda, feature_names, n_topics)
 
 
 if __name__ == "__main__":
@@ -117,5 +75,4 @@ if __name__ == "__main__":
     process.build_data()
     X_train, y_train, X_test, Y_test = process.vec()
     clf = classify(X_train, y_train, X_test, Y_test)
-    clf.bg()
-    # clf.LR()
+    clf.lda(process.feature_names)
